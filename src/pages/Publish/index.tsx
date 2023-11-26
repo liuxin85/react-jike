@@ -9,6 +9,7 @@ import {
   Space,
   Select,
   RadioChangeEvent,
+  message,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -18,6 +19,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useEffect, useState } from "react";
 import { createArticleAPI, getChannelAPI } from "@/apis/article";
+import { UploadChangeParam, UploadFile } from "antd/es/upload";
 
 const { Option } = Select;
 
@@ -38,14 +40,16 @@ const Publish = () => {
   // 提交表单
   const onFinish = (formValue) => {
     console.log(formValue);
+    // 校验封面类型imageType是否和实际图片列表imageList数量相等
+    if (imageList.length !== imageType) return message.warning("封面类型和图片数量不匹配");
     const { title, content, channel_id } = formValue;
     // 1. 按照接口文档的格式处理收集到的表单数据
     const reqData = {
       title,
       content,
       cover: {
-        type: 0,
-        images: [],
+        type: imageType,
+        images: imageList.map((item) => item.response.data.url),
       },
       channel_id,
     };
@@ -53,12 +57,13 @@ const Publish = () => {
     // 2. 调用接口提交
     createArticleAPI(reqData);
   };
-  const onUploadChange = (info) => {
+  const onUploadChange = (info: UploadChangeParam<UploadFile<unknown>>) => {
+    console.log(info);
     setImageList(info.fileList);
   };
 
   // 切换图片封面类型
-  const [imagetype, setImageType] = useState(0);
+  const [imageType, setImageType] = useState(0);
 
   const onTypeChange = (e: RadioChangeEvent) => {
     console.log("change ", e.target.value);
@@ -102,13 +107,14 @@ const Publish = () => {
                 <Radio value={0}>无图</Radio>
               </Radio.Group>
             </Form.Item>
-            {imagetype > 0 && (
+            {imageType > 0 && (
               <Upload
                 name="image"
                 listType="picture-card"
                 showUploadList
                 action={"http://geek.itheima.net/v1_0/upload"}
-                onChange={onUploadChange}>
+                onChange={onUploadChange}
+                maxCount={imageType}>
                 <div style={{ marginTop: 8 }}>
                   <PlusOutlined />
                 </div>
