@@ -71,7 +71,7 @@ const Publish = () => {
     // 1. 通过id获取数据
     async function getArticleDetail() {
       const res = await getArticlById(articleId);
-      const data = res.data
+      const data = res.data;
       form.setFieldsValue({ ...data, type: data.cover.type });
 
       // 回填图片列表
@@ -83,7 +83,10 @@ const Publish = () => {
         })
       );
     }
-    getArticleDetail();
+    // 只有有id的时候才调用此函数
+    if (articleId) {
+      getArticleDetail();
+    }
 
     //2.调用实例方法完成回填
   }, [articleId, form]);
@@ -91,7 +94,12 @@ const Publish = () => {
     <div className="publish">
       <Card
         title={
-          <Breadcrumb items={[{ title: <Link to={"/"}>首页</Link> }, { title: "发布文章" }]} />
+          <Breadcrumb
+            items={[
+              { title: <Link to={"/"}>首页</Link> },
+              { title: `${articleId ? "编辑" : "发布"}文章` },
+            ]}
+          />
         }>
         <Form
           form={form}
@@ -134,8 +142,7 @@ const Publish = () => {
                 action={"http://geek.itheima.net/v1_0/upload"}
                 onChange={onUploadChange}
                 maxCount={imageType}
-                fileList={imageList}
-                >
+                fileList={imageList}>
                 <div style={{ marginTop: 8 }}>
                   <PlusOutlined />
                 </div>
