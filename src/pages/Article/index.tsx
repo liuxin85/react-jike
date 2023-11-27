@@ -1,5 +1,15 @@
 import { Link } from "react-router-dom";
-import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select } from "antd";
+import {
+  Card,
+  Breadcrumb,
+  Form,
+  Button,
+  Radio,
+  DatePicker,
+  Select,
+  Popconfirm,
+  message,
+} from "antd";
 // 汉化包
 import locale from "antd/es/date-picker/locale/zh_CN";
 
@@ -8,13 +18,27 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import img404 from "@/assets/error.png";
 import { useChannel } from "@/hooks/useChannel";
 import { useEffect, useState } from "react";
-import { getArticlListAPI } from "@/apis/article";
+import { delArticleAPI, getArticlListAPI } from "@/apis/article";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const Article = () => {
   const { channelList } = useChannel();
+
+  const confirm = async (data) => {
+    console.log(data);
+    // message.success("Click on Yes");
+    await delArticleAPI(data.id);
+    setReqData({
+      ...reqData,
+    });
+  };
+
+  const cancel = (e: React.MouseEvent<HTMLElement>) => {
+    console.log(e);
+    message.error("Click on No");
+  };
 
   const status = {
     1: <Tag color="warning">待审核</Tag>,
@@ -65,7 +89,15 @@ const Article = () => {
         return (
           <Space size="middle">
             <Button type="primary" shape="circle" icon={<EditOutlined />} />
-            <Button type="primary" danger shape="circle" icon={<DeleteOutlined />} />
+            <Popconfirm
+              title="Delete the task"
+              description="Are you sure to delete this task?"
+              onConfirm={() => confirm(data)}
+              onCancel={cancel}
+              okText="Yes"
+              cancelText="No">
+              <Button type="primary" danger shape="circle" icon={<DeleteOutlined />} />
+            </Popconfirm>
           </Space>
         );
       },
