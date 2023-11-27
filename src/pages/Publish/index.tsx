@@ -18,7 +18,7 @@ import "./index.scss";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useEffect, useState } from "react";
-import { createArticleAPI, getArticlById } from "@/apis/article";
+import { createArticleAPI, getArticlById, updateArticleAPI } from "@/apis/article";
 import { UploadChangeParam, UploadFile } from "antd/es/upload";
 import { useChannel } from "@/hooks/useChannel";
 
@@ -39,13 +39,25 @@ const Publish = () => {
       content,
       cover: {
         type: imageType,
-        images: imageList.map((item) => item.response.data.url),
+        // 这里url式新增的逻辑
+        images: imageList.map((item) => {
+          if (item.response) {
+            return item.response.data.url;
+          } else {
+            return item.url;
+          }
+        }),
       },
       channel_id,
     };
 
     // 2. 调用接口提交
-    createArticleAPI(reqData);
+    //处理调用不同的接口 新增-新增接口 编辑=更新接口
+    if (articleId) {
+      updateArticleAPI({...reqData, id: articleId});
+    } else {
+      createArticleAPI(reqData);
+    }
   };
 
   const [imageList, setImageList] = useState([]);
