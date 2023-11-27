@@ -21,7 +21,6 @@ import { useEffect, useState } from "react";
 import { createArticleAPI, getArticlById } from "@/apis/article";
 import { UploadChangeParam, UploadFile } from "antd/es/upload";
 import { useChannel } from "@/hooks/useChannel";
-import { formToJSON } from "axios";
 
 const { Option } = Select;
 
@@ -72,7 +71,17 @@ const Publish = () => {
     // 1. 通过id获取数据
     async function getArticleDetail() {
       const res = await getArticlById(articleId);
-      form.setFieldsValue(res.data)
+      const data = res.data
+      form.setFieldsValue({ ...data, type: data.cover.type });
+
+      // 回填图片列表
+      setImageType(data.cover.type);
+      // 显示图片
+      setImageList(
+        data.cover.images.map((url) => {
+          return { url };
+        })
+      );
     }
     getArticleDetail();
 
@@ -124,7 +133,9 @@ const Publish = () => {
                 showUploadList
                 action={"http://geek.itheima.net/v1_0/upload"}
                 onChange={onUploadChange}
-                maxCount={imageType}>
+                maxCount={imageType}
+                fileList={imageList}
+                >
                 <div style={{ marginTop: 8 }}>
                   <PlusOutlined />
                 </div>
