@@ -14,6 +14,12 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const Article = () => {
+    const { channelList } = useChannel();
+
+    const status = {
+      1: <Tag color="warning">待审核</Tag>,
+      2: <Tag color="green">审核通过</Tag>,
+    };
   const columns = [
     {
       title: "封面",
@@ -34,7 +40,8 @@ const Article = () => {
     {
       title: "状态",
       dataIndex: "status",
-      render: (data) => <Tag color="green">审核通过{data}</Tag>,
+      // data - 后端返回状态status 根据他做他条件渲染
+      render: (data) =>status[data]
     },
     {
       title: "发布时间",
@@ -80,11 +87,11 @@ const Article = () => {
     },
   ];
 
-  const { channelList } = useChannel();
+
 
   // 获取文章列表
   const [list, setList] = useState([]);
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     async function getList() {
@@ -93,7 +100,7 @@ const Article = () => {
       setCount(res.data.total_count);
     }
     getList();
-  },[]);
+  }, []);
   return (
     <div>
       <Card
