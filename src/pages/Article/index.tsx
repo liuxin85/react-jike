@@ -6,6 +6,7 @@ import locale from "antd/es/date-picker/locale/zh_CN";
 import { Table, Tag, Space } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import img404 from "@/assets/error.png";
+import { useChannel } from "@/hooks/useChannel";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -24,11 +25,14 @@ const Article = () => {
       title: "标题",
       dataIndex: "title",
       width: 220,
+      render: (data) => {
+        return <p>{data}</p>;
+      },
     },
     {
       title: "状态",
       dataIndex: "status",
-      render: (data) => <Tag color="green">审核通过</Tag>,
+      render: (data) => <Tag color="green">审核通过{data}</Tag>,
     },
     {
       title: "发布时间",
@@ -73,6 +77,8 @@ const Article = () => {
       title: "wkwebview离线化加载h5资源解决方案",
     },
   ];
+
+  const { channelList } = useChannel();
   return (
     <div>
       <Card
@@ -89,17 +95,17 @@ const Article = () => {
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="频道" name="channel_id">
-            <Select placeholder="请选择文章频道" defaultValue="lucy" style={{ width: 120 }}>
-              <Option value="jack">Jack</Option>
-              <Option value="lucy">Lucy</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item label="日期" name="date">
-            {/* 传入locale属性 控制中文显示*/}
-            <RangePicker locale={locale}></RangePicker>
-          </Form.Item>
+          <Card>
+            <Form.Item label="" name="channel_id">
+              <Select placeholder="请选择文章频道" defaultValue="category" style={{ width: 120 }}>
+                {channelList.map((item) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Card>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ marginLeft: 40 }}>
@@ -110,6 +116,10 @@ const Article = () => {
       </Card>
       {/* 表格区 */}
       <Card title={`根据筛选条件共查询到 count 条结果：`}>
+        <Form.Item label="日期" name="date">
+          {/* 传入locale属性 控制中文显示*/}
+          <RangePicker locale={locale}></RangePicker>
+        </Form.Item>
         <Table rowKey="id" columns={columns} dataSource={data} />
       </Card>
     </div>

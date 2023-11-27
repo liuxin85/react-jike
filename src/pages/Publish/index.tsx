@@ -17,25 +17,15 @@ import "./index.scss";
 
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useEffect, useState } from "react";
-import { createArticleAPI, getChannelAPI } from "@/apis/article";
+import { useState } from "react";
+import { createArticleAPI } from "@/apis/article";
 import { UploadChangeParam, UploadFile } from "antd/es/upload";
+import { useChannel } from "@/hooks/useChannel";
 
 const { Option } = Select;
 
 const Publish = () => {
-  const [channelList, setChannelList] = useState([]);
-  const [imageList, setImageList] = useState([]);
-
-  useEffect(() => {
-    // 1. 封装函数 在函数内部调用接口
-    const getChannelList = async () => {
-      const res = await getChannelAPI();
-      setChannelList(res.data.channels);
-    };
-    // 2. 调用函数
-    getChannelList();
-  }, []);
+  const { channelList } = useChannel();
 
   // 提交表单
   const onFinish = (formValue) => {
@@ -57,6 +47,8 @@ const Publish = () => {
     // 2. 调用接口提交
     createArticleAPI(reqData);
   };
+
+  const [imageList, setImageList] = useState([]);
   const onUploadChange = (info: UploadChangeParam<UploadFile<unknown>>) => {
     console.log(info);
     setImageList(info.fileList);
@@ -64,7 +56,6 @@ const Publish = () => {
 
   // 切换图片封面类型
   const [imageType, setImageType] = useState(0);
-
   const onTypeChange = (e: RadioChangeEvent) => {
     console.log("change ", e.target.value);
     setImageType(e.target.value);
